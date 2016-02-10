@@ -221,5 +221,3 @@ $(function() {
   });
 });
 
-  experiment.debriefing();
-
