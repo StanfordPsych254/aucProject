@@ -52,7 +52,7 @@ $.urlParam = function(name){
 
 // ############################## Configuration settings ##############################
 var faces = [];
-var NUM_TRIALS_PER_DFT = 2;
+var NUM_TRIALS_PER_DFT = 3;
 for (var i = 0; i < NUM_TRIALS_PER_DFT; i++) {
   for (var dft = 0; dft <= 100; dft += 10) {
     faces.push(dft);
