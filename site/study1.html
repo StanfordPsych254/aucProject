@@ -155,8 +155,17 @@
     </div>
 
    <div class="question">
-     <p><b>What is your gender?</b></p>
-     <input type="text" id="gender" name="gender" style="width:40%" value=""></input>
+     <p><b>What is your gender identity?</b></p>
+      <select name="gender" id="gender" form="demographics">
+        <option value="">Choose a gender</option>
+        <option value="female">Female</option>
+        <option value="female_to_male">Female to male transgender</option>
+        <option value="male">Male</option>
+        <option value="male_to_female">Male to female transgender</option>
+        <option value="not_sure">Not sure</option>
+        <option value="other">Other</option>
+        <option value="no_answer">Prefer not to answer</option>
+      </select>
    </div>
 
    <div class="question">
@@ -168,7 +177,8 @@
        <option value="someCollege">Some college</option>
        <option value="4year">4-year college</option>
        <option value="someGrad">Some graduate school</option>
-       <option value="Grad">Graduate degree</option>
+       <option value="grad">Graduate degree</option>
+        <option value="no answer">Prefer not to answer</option>
      </select>
    </div>
 
@@ -185,7 +195,6 @@
    </div>
 
    <!-- TODO: Log where they live? -->
-   <!-- TODO: Log window size -->
 
    <div class="question">
      <p><b>What in your opinion was the goal of the experiment?</b></p>

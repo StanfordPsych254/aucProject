@@ -98,6 +98,8 @@ var experiment = {
       expt_aim: [],
       expt_gen: [],
       user_agent: [],
+      window_width: [],
+      window_height: [],
     },
     
     // end the experiment
@@ -165,6 +167,8 @@ var experiment = {
           
           // push all relevant variables into data object     
           experiment.data.face.push(face_dft);
+          experiment.data.window_width.push($(window).width());
+          experiment.data.window_height.push($(window).height());
           
           showSlide("stage");
       }
