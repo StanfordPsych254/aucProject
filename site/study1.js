@@ -95,12 +95,17 @@ var experiment = {
       race: [],
       face: [],
       rating: [],
+      elapsed_ms: [],
+      num_errors: [],
       expt_aim: [],
       expt_gen: [],
       user_agent: [],
       window_width: [],
       window_height: [],
     },
+
+    start_ms: 0,  // time current trial started ms
+    num_errors: 0,    // number of errors so far in current trial
 
     // end the experiment
     end: function() {
@@ -113,6 +118,7 @@ var experiment = {
     // LOG RESPONSE
     log_response: function() {
       var response_logged = false;
+      var elapsed = Date.now() - experiment.start_ms;
 
       //Array of radio buttons
       var radio = document.getElementsByName("judgment");
@@ -121,6 +127,8 @@ var experiment = {
       for (i = 0; i < radio.length; i++) {
         if (radio[i].checked) {
           experiment.data.rating.push(radio[i].value);
+          experiment.data.elapsed_ms.push(elapsed);
+          experiment.data.num_errors.push(experiment.num_errors);
           response_logged = true;
         }
       }
@@ -135,8 +143,8 @@ var experiment = {
 
         $('#stage-content').hide();
         experiment.next();
-        // TODO: Log time for each response.
       } else {
+          experiment.num_errors += 1;
           $("#testMessage").html('<font color="red">' +
                'Please make a response!' +
                '</font>');
@@ -153,6 +161,8 @@ var experiment = {
           // style="width:progressTotal%"
           window.setTimeout(function() {
             $('#stage-content').show();
+            experiment.start_ms = Date.now();
+            experiment.errors = 0;
           }, 150);
 
           // Get the current trial - <code>shift()</code> removes the first element
