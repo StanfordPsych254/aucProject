@@ -132,6 +132,8 @@ var experiment = {
         for (i = 0; i < radio.length; i++) {
           radio[i].checked = false
         }
+
+        $('#stage-content').hide();
         experiment.next();
         // TODO: Log time for each response.
       } else {
@@ -145,11 +147,13 @@ var experiment = {
     next: function() {
       // Allow experiment to start if it's a turk worker OR if it's a test run
       if (window.self == window.top | turk.workerId.length > 0) {
-
           $("#testMessage").html('');   // clear the test message
           $("#prog").attr("style","width:" +
               String(100 * (1 - faces.length/totalTrials)) + "%")
           // style="width:progressTotal%"
+          window.setTimeout(function() {
+            $('#stage-content').show();
+          }, 150);
 
           // Get the current trial - <code>shift()</code> removes the first element
           // select from our scales array and stop exp after we've exhausted all the domains
