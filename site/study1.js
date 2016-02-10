@@ -69,8 +69,8 @@ faces = shuffle(faces);
 var totalTrials = faces.length;
 
 // Initialize trial to trustworthy or attractive
-var type = $.urlParam('type');
-if (type.toLowerCase() == 'attractive') {
+var type = Math.random();
+if (type >= 0.5) {
   type = 'attractive';
   $('.attractiveness-instr').show();
   $('.trustworthy-instr').hide();
