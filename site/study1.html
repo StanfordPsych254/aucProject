@@ -18,23 +18,26 @@
   <br>
   <img src="images/stanford.png" alt="Stanford University">
   <h3 id='logo-text'>Stanford Language and Cognition Lab</h3>
-  <p class="block-text trustworthy-instr">
-  In this experiment you will be asked to record your first impression of faces.
+  <div class="block-text trustworthy-instr">
+  <p>In this experiment you will be asked to record your first impression of faces.
   Many times we meet strangers for the first time and form our first impression
   based on their faces.  There are faces that look trustworthy and there are
-  faces that look untrustworthy.  In this experiment different faces will be
+  faces that look untrustworthy.</p>
+  <p>In this experiment different faces will be
   presented to you and you will be required to judge their trustworthiness level.
   Judgment will be done using a 1 (Definitely not trustworthy) to 9 (Definitely
   trustworthy) scale.
   </p>
-  <p class="block-text attractiveness-instr">
-  Many times we meet strangers for the first time and form our first impression
+  </div>
+  <div class="block-text attractiveness-instr">
+  <p>Many times we meet strangers for the first time and form our first impression
   based on their faces.  There are faces that look attractive and there are faces
-  that look unattractive.  In this experiment different faces will be presented to
+  that look unattractive.</p>
+  <p>In this experiment different faces will be presented to
   you and you will be required to judge their attractiveness level.  Judgment will
   be done using a 1 (Definitely not attractive) to 9 (Definitely attractive)
-  scale.
-  </p>
+  scale.</p>
+  </div>
 
   <p class="block-text">
   There are no right or wrong answers and you are required to answer as soon as
@@ -62,13 +65,14 @@
 </div>
 
 <div class="slide" id="instructions2">
-  <p class="block-text">Please read the question again in every new screen. The
-  time it takes to switch from one screen to the next depends on the quality of
-  your internet connection. Therefore, in order to prevent a rejection of
-  answers, please mark your answer after the face is fully presented.
+  <p class="block-text">Please read the question again in every new screen and
+  mark your answer for each face before clicking "Next". You will not be able
+  to go back to previous screens.
   </p>
-
+<!--
   <button type="button" onclick="this.blur(); experiment.next()">Start</button>
+-->
+  <button type="button" onclick="this.blur(); experiment.debriefing()">End</button>
 </div>
 
 <!-- The stage slide. -->
@@ -123,7 +127,7 @@
 
   <table align="center"><tr>
   <td align="center">
-  <button type="button" id="nextButton" onClick="experiment.log_response()"> next</button>
+  <button type="button" id="nextButton" onClick="experiment.log_response()">Next</button>
          </td> 
       <tr><td align="center">
       <div id="testMessage"> </div>
@@ -134,21 +138,69 @@
 
  <!-- The debriefing slide. -->
  <div class="slide" id="debriefing">
-   <p>What in your opinion was the goal of the experiment?</p>
-   <p>
-  <textarea type="text" id="expthoughts" style="width:100%" name="expaim"></textarea>
-   </p>
+   <div class="question">
+     <p><b>What is your age?</b></p>
+      <select name="age" id="age" form="demographics">
+        <option value="">Choose an age</option>
+        <option value="0-19">&nbsp;0-19</option>
+        <option value="20-29">20-29</option>
+        <option value="30-39">30-39</option>
+        <option value="40-49">40-49</option>
+        <option value="50-59">50-59</option>
+        <option value="60-69">60-69</option>
+        <option value="70-79">70-79</option>
+        <option value="80-89">80-89</option>
+        <option value="&gt;90">90+</option>
+      </select>
+    </div>
 
-   <p>If you have any comment about the experiment, please write it here.</p>
-   <p>
-   <textarea type="textarea" id="expcomments" style="width:100%" name="expgen"></textarea>
-   </p>
-  </form>
+   <div class="question">
+     <p><b>What is your gender?</b></p>
+     <input type="text" id="gender" name="gender" style="width:40%" value=""></input>
+   </div>
+
+   <div class="question">
+     <p><b>What is your highest level of education completed?</b></p>
+     <select name="education" id="education" form="demographics">
+       <option value="">Choose a level</option>
+       <option value="gradeSchool">Grade school</option>
+       <option value="highSchool">High school</option>
+       <option value="someCollege">Some college</option>
+       <option value="4year">4-year college</option>
+       <option value="someGrad">Some graduate school</option>
+       <option value="Grad">Graduate degree</option>
+     </select>
+   </div>
+
+   <div class="question">
+     <p><b>What is your race? Please check all that apply.</b></p>
+     <form>
+       <input type="checkbox" name="race" value="amInd"> American Indian or Alaskan Native</input><br />
+       <input type="checkbox" name="race" value="asian"> Asian</input><br/>
+       <input type="checkbox" name="race" value="natHaw"> Native Hawaiian or US Pacific Islander</input><br/>
+       <input type="checkbox" name="race" value="black"> Black/African American</input><br/>
+       <input type="checkbox" name="race" value="white"> White</input><br/>
+       <input type="checkbox" name="race" value="other"> Other</input><br/>
+     </form>
+   </div>
+
+   <!-- TODO: Log where they live? -->
+   <!-- TODO: Log window size -->
+
+   <div class="question">
+     <p><b>What in your opinion was the goal of the experiment?</b></p>
+     <textarea type="text" id="expthoughts" style="width:100%" name="expaim"></textarea>
+   </div>
+
+   <div class="question">
+     <p><b>If you have any comment about the experiment, please write it here.</b></p>
+     <textarea type="textarea" id="expcomments" style="width:100%" name="expgen"></textarea>
+   </div>
   
   <div align="center">
     <button type="button" id="debriefsubmit" onClick="experiment.submit_comments()">Submit</button>
   </div>
-  </div>
+</div>
   
 <!-- The finish slide. -->
 <div class="slide" id="finished">

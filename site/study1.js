@@ -51,30 +51,18 @@ $.urlParam = function(name){
 }
 
 // ############################## Configuration settings ##############################
-var faces = [
-  'images/EXP1_DFT_00.jpg',
-  'images/EXP1_DFT_10.jpg',
-  'images/EXP1_DFT_20.jpg',
-  'images/EXP1_DFT_30.jpg',
-  'images/EXP1_DFT_40.jpg',
-  'images/EXP1_DFT_50.jpg',
-  'images/EXP1_DFT_60.jpg',
-  'images/EXP1_DFT_70.jpg',
-  'images/EXP1_DFT_80.jpg',
-  'images/EXP1_DFT_90.jpg',
-  'images/EXP1_DFT_100.jpg',
-  'images/EXP1_DFT_00.jpg',
-  'images/EXP1_DFT_10.jpg',
-  'images/EXP1_DFT_20.jpg',
-  'images/EXP1_DFT_30.jpg',
-  'images/EXP1_DFT_40.jpg',
-  'images/EXP1_DFT_50.jpg',
-  'images/EXP1_DFT_60.jpg',
-  'images/EXP1_DFT_70.jpg',
-  'images/EXP1_DFT_80.jpg',
-  'images/EXP1_DFT_90.jpg',
-  'images/EXP1_DFT_100.jpg'
-]; 
+var faces = [];
+var NUM_TRIALS_PER_DFT = 2;
+for (var i = 0; i < NUM_TRIALS_PER_DFT; i++) {
+  for (var dft = 0; dft <= 100; dft += 10) {
+    faces.push(dft);
+  }
+}
+
+function getFaceFile(dft) {
+  if (dft == 0) dft = '00';
+  return 'images/EXP1_DFT_' + dft + '.jpg';
+}
 
 faces = shuffle(faces); 
 
@@ -100,11 +88,16 @@ var experiment = {
     
     // The object to be submitted.
     data: {
-      type: '',
+      type: [],
+      age: [],
+      gender: [],
+      education: [],
+      race: [],
       face: [],
       rating: [],
       expt_aim: [],
       expt_gen: [],
+      user_agent: [],
     },
     
     // end the experiment
@@ -138,6 +131,7 @@ var experiment = {
           radio[i].checked = false
         }
         experiment.next();
+        // TODO: Log time for each response.
       } else {
           $("#testMessage").html('<font color="red">' + 
                'Please make a response!' + 
@@ -157,19 +151,20 @@ var experiment = {
           
           // Get the current trial - <code>shift()</code> removes the first element
           // select from our scales array and stop exp after we've exhausted all the domains
-          var face = faces.shift();
+          var face_dft = faces.shift();
           
           //If the current trial is undefined, call the end function.
-          if (typeof face == "undefined") {
+          if (typeof face_dft == "undefined") {
             return experiment.debriefing();
           }
+          var face_filename = getFaceFile(face_dft);
                 
           // Display the sentence stimuli
-          $("#face").attr('src', face);
+          $("#face").attr('src', face_filename);
           
           
           // push all relevant variables into data object     
-          experiment.data.face.push(face);
+          experiment.data.face.push(face_dft);
           
           showSlide("stage");
       }
@@ -182,8 +177,19 @@ var experiment = {
 
     // submitcomments function
     submit_comments: function() {
+      var races = document.getElementsByName("race");
+      for (i = 0; i < races.length; i++) {
+        if (races[i].checked) {
+          experiment.data.race.push(races[i].value);      
+        }
+      }
+      experiment.data.age.push(document.getElementById("age").value);
+      experiment.data.gender.push(document.getElementById("gender").value);
+      experiment.data.education.push(document.getElementById("education").value);
       experiment.data.expt_aim.push(document.getElementById("expthoughts").value);
       experiment.data.expt_gen.push(document.getElementById("expcomments").value);
+      experiment.data.type.push(type);
+      experiment.data.user_agent.push(window.navigator.userAgent);
       experiment.end();
     }
 }
