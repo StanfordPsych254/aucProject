@@ -35,14 +35,18 @@ input[type="radio"] {
   margin: 10px;
 }
 
-label {
+#stage label {
   cursor: pointer;
   display: inline-block;
   padding: 6px;
 }
 
-label:hover {
+#stage label:hover {
   background: #efefef;
+}
+
+#demographics label {
+  display: inline;
 }
 
 button {
@@ -137,4 +141,10 @@ td {
 
 #debriefing .question {
   margin-bottom: 1.1em;
+}
+
+#demographics label.error {
+  color: red;
+  margin-left: .5em;
+  display: none;
 }

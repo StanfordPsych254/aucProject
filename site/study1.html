@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="style.css" />
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="http://cdn.jsdelivr.net/jquery.validation/1.14.0/jquery.validate.min.js"></script>
 </head>
 <body>
 
@@ -69,10 +70,7 @@
   mark your answer for each face before clicking "Next". You will not be able
   to go back to previous screens.
   </p>
-<!--
   <button type="button" onclick="this.blur(); experiment.next()">Start</button>
--->
-  <button type="button" onclick="this.blur(); experiment.debriefing()">End</button>
 </div>
 
 <!-- The stage slide. -->
@@ -137,10 +135,13 @@
  </div>
 
  <!-- The debriefing slide. -->
+ <form id="demographics">
  <div class="slide" id="debriefing">
    <div class="question">
-     <p><b>What is your age?</b></p>
-      <select name="age" id="age" form="demographics">
+     <p><b>What is your age?</b>
+       <label id="age-error" class="error" for="age">Please choose an option</label>
+      </p>
+      <select name="age" id="age" form="demographics" required>
         <option value="">Choose an age</option>
         <option value="0-19">&nbsp;0-19</option>
         <option value="20-29">20-29</option>
@@ -155,8 +156,11 @@
     </div>
 
    <div class="question">
-     <p><b>What is your gender identity?</b></p>
-      <select name="gender" id="gender" form="demographics">
+     <p>
+       <b>What is your gender identity?</b>
+       <label id="gender-error" class="error" for="gender">Please choose an option</label>
+      </p>
+      <select name="gender" id="gender" form="demographics" required>
         <option value="">Choose a gender</option>
         <option value="female">Female</option>
         <option value="female_to_male">Female to male transgender</option>
@@ -169,8 +173,11 @@
    </div>
 
    <div class="question">
-     <p><b>What is your highest level of education completed?</b></p>
-     <select name="education" id="education" form="demographics">
+     <p>
+       <b>What is your highest level of education completed?</b>
+       <label id="education-error" class="error" for="education">Please choose an option</label>
+     </p>
+     <select name="education" id="education" form="demographics" required>
        <option value="">Choose a level</option>
        <option value="gradeSchool">Grade school</option>
        <option value="highSchool">High school</option>
@@ -178,20 +185,24 @@
        <option value="4year">4-year college</option>
        <option value="someGrad">Some graduate school</option>
        <option value="grad">Graduate degree</option>
-        <option value="no answer">Prefer not to answer</option>
+       <option value="no_answer">Prefer not to answer</option>
      </select>
    </div>
 
    <div class="question">
-     <p><b>What is your race? Please check all that apply.</b></p>
-     <form>
-       <input type="checkbox" name="race" value="amInd"> American Indian or Alaskan Native</input><br />
-       <input type="checkbox" name="race" value="asian"> Asian</input><br/>
-       <input type="checkbox" name="race" value="natHaw"> Native Hawaiian or US Pacific Islander</input><br/>
-       <input type="checkbox" name="race" value="black"> Black/African American</input><br/>
-       <input type="checkbox" name="race" value="white"> White</input><br/>
-       <input type="checkbox" name="race" value="other"> Other</input><br/>
-     </form>
+     <p>
+       <b>What is your race? Please check all that apply.</b>
+       <label id="race[]-error" class="error" for="race[]">Please choose an option</label>
+     </p>
+     <fieldset form="demographics" id="race_group">
+       <input type="checkbox" name="race[]" value="amInd"> American Indian or Alaskan Native</input><br />
+       <input type="checkbox" name="race[]" value="asian"> Asian</input><br/>
+       <input type="checkbox" name="race[]" value="natHaw"> Native Hawaiian or US Pacific Islander</input><br/>
+       <input type="checkbox" name="race[]" value="black"> Black/African American</input><br/>
+       <input type="checkbox" name="race[]" value="white"> White</input><br/>
+       <input type="checkbox" name="race[]" value="other"> Other</input><br/>
+       <input type="checkbox" name="race[]" value="no_answer"> Prefer not to answer</option>
+     </fieldset>
    </div>
 
    <!-- TODO: Log where they live? -->
@@ -207,8 +218,12 @@
    </div>
   
   <div align="center">
-    <button type="button" id="debriefsubmit" onClick="experiment.submit_comments()">Submit</button>
+  <!--
+    <button type="submit" id="debriefsubmit" onClick="experiment.submit_comments()">Submit</button>
+    -->
+    <button type="submit" id="debriefsubmit">Submit</button>
   </div>
+  </form>
 </div>
   
 <!-- The finish slide. -->

@@ -26,17 +26,17 @@ Array.prototype.random = function() {
 
 // shuffle function - from stackoverflow?
 // shuffle ordering of argument array -- are we missing a parenthesis?
-function shuffle (a) 
-{ 
+function shuffle (a)
+{
     var o = [];
-    
+
     for (var i=0; i < a.length; i++) {
       o[i] = a[i];
     }
-    
+
     for (var j, x, i = o.length;
          i;
-         j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x); 
+         j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
     return o;
 }
 
@@ -64,7 +64,7 @@ function getFaceFile(dft) {
   return 'images/EXP1_DFT_' + dft + '.jpg';
 }
 
-faces = shuffle(faces); 
+faces = shuffle(faces);
 
 var totalTrials = faces.length;
 
@@ -85,7 +85,7 @@ showSlide("instructions");
 
 // ############################## The main event ##############################
 var experiment = {
-    
+
     // The object to be submitted.
     data: {
       type: [],
@@ -101,7 +101,7 @@ var experiment = {
       window_width: [],
       window_height: [],
     },
-    
+
     // end the experiment
     end: function() {
       showSlide("finished");
@@ -113,21 +113,21 @@ var experiment = {
     // LOG RESPONSE
     log_response: function() {
       var response_logged = false;
-      
+
       //Array of radio buttons
       var radio = document.getElementsByName("judgment");
-      
+
       // Loop through radio buttons
       for (i = 0; i < radio.length; i++) {
         if (radio[i].checked) {
           experiment.data.rating.push(radio[i].value);
-          response_logged = true;       
+          response_logged = true;
         }
       }
-  
+
       if (response_logged) {
         nextButton.blur();
-        
+
         // uncheck radio buttons
         for (i = 0; i < radio.length; i++) {
           radio[i].checked = false
@@ -135,41 +135,41 @@ var experiment = {
         experiment.next();
         // TODO: Log time for each response.
       } else {
-          $("#testMessage").html('<font color="red">' + 
-               'Please make a response!' + 
+          $("#testMessage").html('<font color="red">' +
+               'Please make a response!' +
                '</font>');
       }
     },
-    
+
     // The work horse of the sequence - what to do on every trial.
     next: function() {
       // Allow experiment to start if it's a turk worker OR if it's a test run
       if (window.self == window.top | turk.workerId.length > 0) {
-          
+
           $("#testMessage").html('');   // clear the test message
           $("#prog").attr("style","width:" +
               String(100 * (1 - faces.length/totalTrials)) + "%")
           // style="width:progressTotal%"
-          
+
           // Get the current trial - <code>shift()</code> removes the first element
           // select from our scales array and stop exp after we've exhausted all the domains
           var face_dft = faces.shift();
-          
+
           //If the current trial is undefined, call the end function.
           if (typeof face_dft == "undefined") {
             return experiment.debriefing();
           }
           var face_filename = getFaceFile(face_dft);
-                
+
           // Display the sentence stimuli
           $("#face").attr('src', face_filename);
-          
-          
-          // push all relevant variables into data object     
+
+
+          // push all relevant variables into data object
           experiment.data.face.push(face_dft);
           experiment.data.window_width.push($(window).width());
           experiment.data.window_height.push($(window).height());
-          
+
           showSlide("stage");
       }
     },
@@ -184,7 +184,7 @@ var experiment = {
       var races = document.getElementsByName("race");
       for (i = 0; i < races.length; i++) {
         if (races[i].checked) {
-          experiment.data.race.push(races[i].value);      
+          experiment.data.race.push(races[i].value);
         }
       }
       experiment.data.age.push(document.getElementById("age").value);
@@ -197,4 +197,29 @@ var experiment = {
       experiment.end();
     }
 }
+
+$(function() {
+  $('form#demographics').validate({
+    rules: {
+      "age": "required",
+      "gender": "required",
+      "education": "required",
+      "race[]": "required",
+    },
+    messages: {
+      "age": "Please choose an option",
+      "gender": "Please choose an option",
+      "education": "Please choose an option",
+    },
+    submitHandler: experiment.submit_comments
+  });
+  $('#race_group input[value=no_answer]').click(function() {
+    $('#race_group input').not('input[value=no_answer]').attr('checked', false);
+  });
+  $('#race_group input').not('input[value=no_answer]').click(function() {
+    $('#race_group input[value=no_answer]').attr('checked', false);
+  });
+});
+
+  experiment.debriefing();
 
