@@ -162,7 +162,7 @@ var experiment = {
           window.setTimeout(function() {
             $('#stage-content').show();
             experiment.start_ms = Date.now();
-            experiment.errors = 0;
+            experiment.num_errors = 0;
           }, 150);
 
           // Get the current trial - <code>shift()</code> removes the first element
