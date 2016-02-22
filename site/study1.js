@@ -94,7 +94,6 @@ var experiment = {
       education: [],
       race: [],
       face: [],
-      face_file: [],
       rating: [],
       elapsed_ms: [],
       num_errors: [],
