@@ -1,0 +1,2 @@
+Time,Action,Data
+2016/02/22 12:03:20,Create,"{u'description': u'A simple survey about first impressions', u'title': u'Face impressions', u'url': u'https://web.stanford.edu/~auc/psych254/study1.html', u'assignment_duration': u'10 minutes', u'qualifications': {u'location': u'US', u'approval_percentage': 85}, u'frame_height': 450, u'keywords': u'faces, survey', u'auto_approval_delay': u'5 minutes', u'reward': 1.0}"

@@ -1,0 +1,14 @@
+{
+    "title":               "Face impressions",
+    "description":         "A simple survey about first impressions",
+    "keywords":            "faces, survey",
+    "url":                 "https://web.stanford.edu/~auc/psych254/study1.html",
+    "frame_height":         640,
+    "assignment_duration":  "3 minutes",
+    "auto_approval_delay":  "5 minutes",
+    "reward":               0.30,
+    "qualifications": {
+        "location": "US",
+        "approval_percentage": 85
+    }
+}
