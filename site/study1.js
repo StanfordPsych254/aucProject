@@ -197,7 +197,7 @@ var experiment = {
 
     // submitcomments function
     submit_comments: function() {
-      var races = document.getElementsByName("race");
+      var races = document.getElementsByName("race[]");
       for (i = 0; i < races.length; i++) {
         if (races[i].checked) {
           experiment.data.race.push(races[i].value);
