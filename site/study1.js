@@ -94,6 +94,7 @@ var experiment = {
       education: [],
       race: [],
       face: [],
+      face_file: [],
       rating: [],
       elapsed_ms: [],
       num_errors: [],
@@ -174,6 +175,7 @@ var experiment = {
             return experiment.debriefing();
           }
           var face_filename = getFaceFile(face_dft);
+          experiment.data.face_file.push(face_filename);
 
           // Display the sentence stimuli
           $("#face").attr('src', face_filename);
