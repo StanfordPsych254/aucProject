@@ -1,47 +1,171 @@
 ---
 title: "Pilot analysis"
 author: "Carolyn Au"
-date: "February 22, 2016"
-output: html_document
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    toc: yes
 ---
 
+<style type="text/css">
+body, td {
+   font-size: 14px;
+}
+code {
+  font-size: 11px;
+}
+pre {
+  font-size: 11px;
+}
+</style>
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, include = FALSE}
 rm(list=ls())
+suppressPackageStartupMessages(c("dplyr","tidyr","ggplot2","lme4"))
+library(knitr)
 library(tidyr)
 library(dplyr)
 library(rjson)
+library(ggplot2)
+library(lme4)
 library(langcog) # devtools::install_github("langcog/langcog")
+
+opts_chunk$set(fig.width=8, fig.height=5, 
+               echo=TRUE, warning=FALSE, message=TRUE, cache=TRUE)
+theme_set(theme_bw())
+
+sem <- function(x) {sd(x, na.rm=TRUE) / sqrt(length(x))}
+ci95 <- function(x) {sem(x) * 1.96}
 ```
 
 # Data prep
+
+Load the data.
 
 ```{r}
 path <- "~/code/aucProject/data/"
 files <- dir(paste0(path,"sandbox-results/"), pattern = "*.json")
 d.raw <- data.frame()
+d.balance <- data.frame()
 
 for (f in files) {
   jf <- paste0(path, "sandbox-results/", f)
   jd <- fromJSON(paste(readLines(jf), collapse=""))
+  race <- paste(jd$data$race, collapse="+")
   id <- data.frame(workerid = jd$workerId,
-                   face_dft = jd$data$face, 
-                   face_rating = jd$data$rating,
+                   race = race,
+                   face_dft = as.numeric(jd$data$face),
+                   face_rating = as.numeric(jd$data$rating),
                    exp_type = jd$data$type,
                    elapsed_ms = jd$data$elapsed_ms,
                    num_errors = jd$data$num_errors,
                    gender = jd$data$gender,
                    education = jd$data$education)
-                   #race = jd$data$race)
   d.raw <- bind_rows(d.raw, id)
+  
+  id <- data.frame(workerid = jd$workerId,
+                   race = race,
+                   exp_type = jd$data$type,
+                   gender = jd$data$gender,
+                   education = jd$data$education)
+  d.balance <- bind_rows(d.balance, id)
 }
 
-# Number of participants
-length(unique(d.raw$workerid))
+message("Number of participants: ", length(unique(d.raw$workerid)))
 ```
+
+Simple balance checks:
+
+```{r}
+# Balance by gender:
+table(d.balance$gender)
+
+# Balance by type:
+table(d.balance$exp_type)
+
+# Balance by Face DFT's presented:
+table(d.raw$face_dft)
+```
+
+# Initial data plots
+
+Quick check to see distribution of results per participant.
 
 ```{r}
 ggplot(d.raw, aes(x=face_dft, y=face_rating, color=factor(workerid))) +
   geom_point(stat="identity", alpha=0.5) + 
-  facet_wrap(~workerid)
+  facet_wrap(~exp_type)
+```
+
+
+Check errors and reaction times
+
+```{r}
+d.raw %>%
+  filter(elapsed_ms < 10000) %>%
+  ggplot(aes(x=elapsed_ms)) +
+    geom_histogram(bins=20) +
+    facet_wrap(~num_errors)
+```
+
+# Replicating analysis
+
+Compute within-subjects means, and errors across participants:
+
+```{r}
+ms <- d.raw %>%
+  group_by(exp_type, face_dft, workerid) %>%
+  summarise(mean = mean(face_rating)) %>%
+  group_by(exp_type, face_dft) %>%
+  summarise(ci=ci95(mean), mean=mean(mean))
+
+ggplot(ms, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type)) +
+  geom_point() +
+  geom_line() +
+  geom_errorbar(aes(ymax=mean+ci, ymin=mean-ci),
+                width=.25) +
+  xlab('DFT %') +
+  ylab('Mean Judgment')
+```
+
+# Verify DV's that differ from original study
+
+## Effect of gender
+```{r}
+ms.gender <- d.raw %>%
+  group_by(gender, exp_type, face_dft, workerid) %>%
+  summarise(mean = mean(face_rating)) %>%
+  group_by(gender, exp_type, face_dft) %>%
+  summarise(ci=ci95(mean), mean=mean(mean))
+
+ggplot(ms.gender, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type)) +
+  geom_point() +
+  geom_line() +
+  geom_errorbar(aes(ymax=mean+ci, ymin=mean-ci),
+                width=.25) +
+  xlab('DFT %') +
+  ylab('Mean Judgment') +
+  facet_wrap(~gender)
+```
+
+## Effect of ethnicity
+
+```{r}
+ms.race <- d.raw %>%
+  group_by(race, exp_type, face_dft, workerid) %>%
+  summarise(mean = mean(face_rating)) %>%
+  group_by(race, exp_type, face_dft) %>%
+  summarise(ci=ci95(mean), mean=mean(mean))
+
+ggplot(ms.race, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type)) +
+  geom_point() +
+  geom_line() +
+  geom_errorbar(aes(ymax=mean+ci, ymin=mean-ci),
+                width=.25) +
+  xlab('DFT %') +
+  ylab('Mean Judgment') +
+  facet_wrap(~race)
 ```
