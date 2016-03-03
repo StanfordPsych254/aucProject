@@ -1,5 +1,9 @@
 ---
-title: "Pilot analysis"
+title: Replication of \"What is Typical is Good&#58; The Influence of Face Typicality on Perceived Trustworthiness\"
+subtitle:
+  by Carmel Sofer, Ron Dotsch, Daniel H J Wigboldus & Alexander Todorov
+  (2015, Psychological Science)
+  
 author: "Carolyn Au"
 date: '`r Sys.Date()`'
 output:
@@ -14,10 +18,7 @@ output:
 body, td {
    font-size: 14px;
 }
-code {
-  font-size: 11px;
-}
-pre {
+code, pre, blockquote {
   font-size: 11px;
 }
 </style>
@@ -41,7 +42,87 @@ sem <- function(x) {sd(x, na.rm=TRUE) / sqrt(length(x))}
 ci95 <- function(x) {sem(x) * 1.96}
 ```
 
-# Data prep
+# Introduction
+In their 2015 APS paper, Sofer et al hypothesized that face typicality affects trustworthiness judgements. Typical faces of varying attractiveness were created from the experiment’s sampled population. Subjects, female students from Hebrew University, were asked to rate these faces on trustworthiness or attractiveness over a 3-week period. They show that for a continuum of faces that vary on a typicality-attractiveness dimension, trustworthiness judgements peak around the typical face. In this replication, we will replicate figure 2 from the original paper.
+
+# Methods
+
+## Power Analysis
+Using the effect size $f^2 = 0.15$ with $\alpha = 0.05$, we did a post-hoc power analysis on the original sample size of 24 participants. To get 80% power, we need 43 participants in each condition, while 90% requires 55 participants and 95% power requires 70% participants.
+
+## Planned Sample
+The planned sample would be US-based mTurkers. We will not be able to replicate the exclusion criteria and restrict the locale to US participants of all genders and all ages. We will collect light demographic information to analyze this difference.
+
+## Materials
+The composite images and questionnaire used in the study is available at https://osf.io/8gwnb/.
+
+### Composite images
+The stimuli is a series of faces, bookended by a typical face and an attractive composite face with 9 transformations between them (with increments of 10% in the difference of shape and reflectance) resulting in 11 faces. “The typical face was developed by a digital averaging process of 92 faces that were representative of the experiment’s sampled population. Participants whose images were used varied in age from 23 to 31 years old.” “The attractive composite face resulted from digitally averaging the 12 most attractive female faces in Winston, O’Doherty, Kilner, Perrett and Dolan’s (2007) face set.”
+
+### Conditions
+**Between-subjects**: 2 conditions, either judging Attractiveness or Trustworthiness.  
+**Within-subjects**: 11 stimuli, each judged 3 times per subject.
+
+## Procedure
+Participants were randomly assigned into two groups. The first group judged trustworthiness, the other attractiveness.
+
+They first read the instructions for their condition and give their consent:
+
+> By answering the following questions, you are participating in a study being performed by the Stanford Department of Psychology. If you have questions about this research, please contact us at stanfordpysch254@gmail.com. You must be at least 18 years old to participate. Your participation in this research is voluntary. You may decline further participation, at any time, without adverse consequences. Your anonymity is assured; the researchers who have requested your participation will not receive any personal information about you. Note however that we have recently been made aware that your public Amazon.com profile can be accessed via your worker ID if you do not choose to opt out. If you would like to opt out of this feature, you may follow instructions available here.
+
+Next, they read the following text (Introduction screen 1):
+
+For Attractive condition
+
+> Many times we meet strangers for the first time and form our first impression based on their faces. There are faces that look attractive and there are faces that look unattractive.  
+>  
+> In this experiment different faces will be presented to you and you will be required to judge their attractiveness level. Judgment will be done using a 1 (Definitely not attractive) to 9 (Definitely attractive) scale.  
+>  
+> There are no right or wrong answers and you are required to answer as soon as you can, after the face is presented.
+
+
+For Trustworthiness condition
+
+> In this experiment you will be asked to record your first impression of faces. Many times we meet strangers for the first time and form our first impression based on their faces. There are faces that look trustworthy and there are faces that look untrustworthy.  
+>  
+> In this experiment different faces will be presented to you and you will be required to judge their trustworthiness level. Judgment will be done using a 1 (Definitely not trustworthy) to 9 (Definitely trustworthy) scale.  
+>  
+> There are no right or wrong answers and you are required to answer as soon as you can, after the face is presented.
+
+Followed by (Introduction screen 2):
+> Please read the question again in every new screen and mark your answer for each face before clicking "Next". You will not be able to go back to previous screens.
+
+On each screen, a single face is shown and a Likert-scale from 1 through 9 is shown for either trustworthiness or attractiveness. Each participant is shown each face three times, randomized.
+
+Finally, a debriefing questionnaire (opt-out) is shown:
+1. What is your age?
+2. What is your gender identity?
+3. What is your highest level of education completed?
+4. What is your race? Please check all that apply.
+5. What in your opinion was the goal of the experiment?
+6. If you have any comment about the experiment, please write it here
+
+Separately, we will record the browser’s user agent and window size programmatically.
+
+# Analysis Plan
+We would like to replicate Figure 2 from the original paper.  
+
+The judgements used for each face are averaged per participant, using the method from Cousineau 2005.  
+ 		
+To mirror the analysis from the original study, we will do the following analysis:
+
+* Regression analysis where we predict the judgements using DFT (distance from typical face), DFT-squared and judgement type (trustworthiness = 1,attractiveness = 0), and their interactions.
+* Repeat measures ANOVA with DFT as a repeated measure and judgement type as a between-subjects factor.
+
+
+# Differences from Original Study
+The first major difference is migrating the experiment to Mechanical Turk. We will not be able to replicate the original sample demographic which was rather specific. This might affect our results since the typical face was composed to reflect that demographic.
+
+
+# Results
+(from a small pilot study)
+
+## Data preparation
 
 Load the data.
 
@@ -54,23 +135,26 @@ d.balance <- data.frame()
 for (f in files) {
   jf <- paste0(path, "sandbox-results/", f)
   jd <- fromJSON(paste(readLines(jf), collapse=""))
-  race <- paste(jd$data$race, collapse="+")
-  id <- data.frame(workerid = jd$workerId,
+  answers <- jd$answers$data
+  race <- paste(answers$race, collapse="+")
+  id <- data.frame(workerid = jd$WorkerId,
                    race = race,
-                   face_dft = as.numeric(jd$data$face),
-                   face_rating = as.numeric(jd$data$rating),
-                   exp_type = jd$data$type,
-                   elapsed_ms = jd$data$elapsed_ms,
-                   num_errors = jd$data$num_errors,
-                   gender = jd$data$gender,
-                   education = jd$data$education)
+                   age = answers$age,
+                   face_dft = as.numeric(answers$face),
+                   face_rating = as.numeric(answers$rating),
+                   exp_type = answers$type,
+                   elapsed_ms = answers$elapsed_ms,
+                   num_errors = answers$num_errors,
+                   gender = answers$gender,
+                   education = answers$education)
   d.raw <- bind_rows(d.raw, id)
   
-  id <- data.frame(workerid = jd$workerId,
+  id <- data.frame(workerid = jd$WorkerId,
                    race = race,
-                   exp_type = jd$data$type,
-                   gender = jd$data$gender,
-                   education = jd$data$education)
+                   age = answers$age,
+                   exp_type = answers$type,
+                   gender = answers$gender,
+                   education = answers$education)
   d.balance <- bind_rows(d.balance, id)
 }
 
@@ -88,20 +172,24 @@ table(d.balance$exp_type)
 
 # Balance by Face DFT's presented:
 table(d.raw$face_dft)
+
+# Balance by age:
+table(d.raw$age)
 ```
 
-# Initial data plots
+
+### Initial data plots
 
 Quick check to see distribution of results per participant.
 
 ```{r}
 ggplot(d.raw, aes(x=face_dft, y=face_rating, color=factor(workerid))) +
-  geom_point(stat="identity", alpha=0.5) + 
+  geom_jitter(stat="identity", alpha=0.5) + 
   facet_wrap(~exp_type)
 ```
 
 
-Check errors and reaction times
+Check errors and reaction times (in this paradigm, an error is counted for a trial when the participant tries to submit without selecting a judgment).
 
 ```{r}
 d.raw %>%
@@ -111,29 +199,70 @@ d.raw %>%
     facet_wrap(~num_errors)
 ```
 
-# Replicating analysis
+Identify outliers
+```{r}
+ggplot(d.raw, aes(x=exp_type, y=elapsed_ms)) +
+  geom_boxplot()
 
-Compute within-subjects means, and errors across participants:
+ggplot(d.raw, aes(x=factor(num_errors), y=elapsed_ms)) +
+  geom_boxplot()
+
+ggplot(d.raw, aes(x=factor(face_dft), face_rating)) +
+  geom_boxplot() +
+  facet_wrap(~exp_type)
+```
+
+
+## Confirmatory analysis
+
+Compute within-subjects means, and errors across participants to generate Figure 2 from the paper.
 
 ```{r}
 ms <- d.raw %>%
   group_by(exp_type, face_dft, workerid) %>%
-  summarise(mean = mean(face_rating)) %>%
-  group_by(exp_type, face_dft) %>%
-  summarise(ci=ci95(mean), mean=mean(mean))
+  summarise(mean_rating = mean(face_rating))
+```
 
-ggplot(ms, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type)) +
+```{r}
+cis <- ms %>%
+  group_by(exp_type, face_dft) %>%
+  summarise(ci=ci95(mean_rating), mean_rating=mean(mean_rating))
+
+ggplot(cis, aes(x=factor(face_dft), y=mean_rating, color=exp_type, group=exp_type)) +
   geom_point() +
   geom_line() +
-  geom_errorbar(aes(ymax=mean+ci, ymin=mean-ci),
+  geom_errorbar(aes(ymax=mean_rating+ci, ymin=mean_rating-ci),
                 width=.25) +
   xlab('DFT %') +
   ylab('Mean Judgment')
 ```
 
-# Verify DV's that differ from original study
+The authors also did a multiple regression analysis which predicted the judgments using DFT, DFT-squared, experiment type and their interactions (all predictors centered).
 
-## Effect of gender
+```{r}
+mean_dft <- mean(ms$face_dft)
+mean_face_rating <- mean(ms$mean_rating)
+centered <- ms %>%
+  mutate(face_rating = mean_rating - mean_face_rating,
+         dft = face_dft - mean_dft)
+pred <- lm(face_rating ~ exp_type + face_dft + I(face_dft ** 2) + face_dft * exp_type + I(face_dft**2) * exp_type,
+           centered)
+summary(pred)
+```
+
+Finally, the authors computed a by-participant ANOVA with DFT as a repeated measure and experiment type as a between-subjects factor.
+> Not sure if I got the formula right for this...
+
+```{r}
+anova <- aov(mean_rating ~ exp_type + face_dft + Error(workerid / face_dft),
+             ms)
+summary(anova)
+```
+
+## Exploratory analyses
+Verify DV's that differ from original study
+
+### Effect of gender
 ```{r}
 ms.gender <- d.raw %>%
   group_by(gender, exp_type, face_dft, workerid) %>%
@@ -151,7 +280,26 @@ ggplot(ms.gender, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type
   facet_wrap(~gender)
 ```
 
-## Effect of ethnicity
+### Effect of age
+
+```{r}
+ms.age <- d.raw %>%
+  group_by(age, exp_type, face_dft, workerid) %>%
+  summarise(mean = mean(face_rating)) %>%
+  group_by(age, exp_type, face_dft) %>%
+  summarise(ci=ci95(mean), mean=mean(mean))
+
+ggplot(ms.age, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type)) +
+  geom_point() +
+  geom_line() +
+  geom_errorbar(aes(ymax=mean+ci, ymin=mean-ci),
+                width=.25) +
+  xlab('DFT %') +
+  ylab('Mean Judgment') +
+  facet_wrap(~age)
+```
+
+### Effect of ethnicity
 
 ```{r}
 ms.race <- d.raw %>%
@@ -169,3 +317,9 @@ ggplot(ms.race, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type))
   ylab('Mean Judgment') +
   facet_wrap(~race)
 ```
+
+# Discussion
+
+## Summary of Replication Attempt
+
+## Commentary
