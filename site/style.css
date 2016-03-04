@@ -86,12 +86,13 @@ button[disabled] {
   margin-bottom: 1em;
 }
 
-#instructions, #instructions2 {
+#instructions, #instructions2, #finished {
   text-align: center;
 }
 
 #debriefing,
-#instructions2 {
+#instructions2,
+#finished {
   margin-top: 3em;
 }
 
