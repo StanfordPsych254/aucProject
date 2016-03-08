@@ -126,9 +126,9 @@ To mirror the analysis from the original study, we will do the following analysi
 
 # Differences from Original Study
 ## Sample differences
-The first major difference is migrating the experiment to Mechanical Turk. While the original study was done in an online experiment, participants were allowed to perform this at their own pace within a predefined period of 3 weeks. It was also done for course credit. In contrast, we give our participants 3 minutes to complete the experiment.
+The first major difference is migrating the experiment to Mechanical Turk. While the original study was done in an online experiment, participants were allowed to perform this at their own pace within a predefined period of 3 weeks. It was also done for course credit. In contrast, our participants complete the experiment in one sitting (advertized as requiring 3 minutes, but participants can take more time if necessary).
 
-We will not be able to replicate the original sample demographic which was rather specific (female students aged 22-33 years old from the Hebrew University in Jerusalem). This might affect our results since the typical face was composed to reflect that demographic. Sofer et al. note that they restricted their study to female participants because men and women perceive feminized faces differently. Due to technical difficulties, we allow participants of all genders. Additionally, we will get participants from a wider age range and different locality to the difficulty of restricting to a similar population on Mechanical Turk.
+We will not be able to replicate the original sample demographic which was rather specific (female students aged 22-33 years old from the Hebrew University in Jerusalem). This might affect our results since the typical face was composed to reflect that demographic. Sofer et al. note that they restricted their study to female participants because men and women perceive feminized faces differently. In the interest of recruiting a broad sample, we allow participants of all genders and will include a supplemental analysis to test whether gender affects responses. Similarly, we will include participants from a wider age range and different location (US instead of Israel) and add supplemental analysis for these additional facets.
 
 ## Procedure differences
 A minor difference is a small change in the instruction text - our study preloads the images so we do not ask participants to wait for the image to be loaded. We also updated the consent form to that of the Stanford Department of Psychology. We also added a demographic questionnaire at the end to analyze our sample differences and a debrief at the end.
@@ -201,6 +201,7 @@ Quick check to see distribution of results per participant.
 ```{r}
 ggplot(d.raw, aes(x=face_dft, y=face_rating, color=factor(workerid))) +
   geom_jitter(stat="identity", alpha=0.5) + 
+  geom_smooth(method = "loess") +
   facet_wrap(~exp_type)
 ```
 
@@ -227,9 +228,12 @@ The authors did a multiple regression analysis which predicted the judgments usi
 mean_dft <- mean(ms$face_dft)
 mean_face_rating <- mean(ms$mean_rating)
 centered <- ms %>%
-  mutate(face_rating = mean_rating - mean_face_rating,
-         dft = face_dft - mean_dft)
-model <- lm(face_rating ~ exp_type + dft + I(dft ** 2) + dft * exp_type + I(dft**2) * exp_type,
+  mutate(centered_face_rating = mean_rating - mean_face_rating,
+         centered_dft = face_dft - mean_dft)
+model <- lm(centered_face_rating ~
+              exp_type + centered_dft + I(centered_dft ** 2) +
+              centered_dft * exp_type + 
+              I(centered_dft**2) * exp_type,
             centered)
 summary(model)
 ```
@@ -238,18 +242,16 @@ To generate Figure 2 from the paper, plot the results of the regression on the w
 
 ```{r}
 # Calculate predictions based on the model to plot
-plotexpl <- expand.grid(dft=seq(-50, 50, 10), exp_type=c("attractive", "trustworthy"))
-plotexpl$predictions <- predict(model, newdata=plotexpl)
+plotexpl <- expand.grid(centered_dft=seq(-50, 50, 10),
+                        exp_type=c("attractive", "trustworthy"))
+plotexpl$centered_rating <- predict(model, newdata=plotexpl)
 
 # Uncenter the values
 plotexpl <- plotexpl %>%
-  mutate(face_rating = predictions + mean_face_rating,
-         face_dft = dft + mean_dft)
+  mutate(face_rating = centered_rating + mean_face_rating,
+         face_dft = centered_dft + mean_dft)
 
-# Compute new CI's
-plotexpl <- plotexpl %>%
-  mutate(ci=ci95(face_rating))
-
+# Plot within-subjects means, between-subjects errors, with predictions from the linear-model
 ggplot(cis, aes(x=factor(face_dft), y=mean_rating, color=exp_type, group=exp_type)) +
   geom_point() +
   geom_line(data=plotexpl, aes(y=face_rating, x=factor(face_dft))) +
@@ -262,7 +264,6 @@ ggplot(cis, aes(x=factor(face_dft), y=mean_rating, color=exp_type, group=exp_typ
 
 
 Finally, the authors computed a by-participant ANOVA with DFT as a repeated measure and experiment type as a between-subjects factor.
-> Not sure if I got the formula right for this...
 
 ```{r}
 anova <- aov(mean_rating ~ exp_type + face_dft + Error(workerid / face_dft),
@@ -271,7 +272,7 @@ summary(anova)
 ```
 
 
-## Supplemental analyses
+## Supplemental analysis
 
 ### Exclusions
 
@@ -367,7 +368,7 @@ ms.gender <- d.raw %>%
 
 ggplot(ms.gender, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type)) +
   geom_point() +
-  geom_line() +
+  geom_smooth(method="loess") +
   geom_errorbar(aes(ymax=mean+ci, ymin=mean-ci),
                 width=.25) +
   xlab('DFT %') +
@@ -386,7 +387,7 @@ ms.age <- d.raw %>%
 
 ggplot(ms.age, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type)) +
   geom_point() +
-  geom_line() +
+  geom_smooth(method="loess") +
   geom_errorbar(aes(ymax=mean+ci, ymin=mean-ci),
                 width=.25) +
   xlab('DFT %') +
@@ -405,7 +406,7 @@ ms.race <- d.raw %>%
 
 ggplot(ms.race, aes(x=factor(face_dft), y=mean, color=exp_type, group=exp_type)) +
   geom_point() +
-  geom_line() +
+  geom_smooth(method="loess") +
   geom_errorbar(aes(ymax=mean+ci, ymin=mean-ci),
                 width=.25) +
   xlab('DFT %') +
