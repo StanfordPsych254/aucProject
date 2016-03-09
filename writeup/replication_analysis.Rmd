@@ -40,7 +40,7 @@ library(lme4)
 library(langcog) # devtools::install_github("langcog/langcog")
 
 opts_chunk$set(fig.width=8, fig.height=5, 
-               echo=TRUE, warning=FALSE, message=TRUE, cache=FALSE)
+               echo=TRUE, warning=FALSE, message=TRUE, cache=TRUE)
 theme_set(theme_bw())
 
 sem <- function(x) {sd(x, na.rm=TRUE) / sqrt(length(x))}
@@ -48,15 +48,15 @@ ci95 <- function(x) {sem(x) * 1.96}
 ```
 
 # Introduction
-In their 2015 APS paper, Sofer et al hypothesized that face typicality affects trustworthiness judgements. Typical faces of varying attractiveness were created from the experiment’s sampled population. Subjects, female students from Hebrew University, were asked to rate these faces on trustworthiness or attractiveness over a 3-week period. They show that for a continuum of faces that vary on a typicality-attractiveness dimension, trustworthiness judgements peak around the typical face. In this replication, we will replicate figure 2 from the original paper.
+In their 2015 APS paper, Sofer et al hypothesized that face typicality affects trustworthiness judgements. Typical faces of varying attractiveness were created from the experiment’s sampled population. Subjects, female students from Hebrew University, were asked to rate these faces on trustworthiness or attractiveness over a 3-week period. They show that for a continuum of faces that vary on a typicality-attractiveness dimension, trustworthiness judgements peak around the typical face. In this replication, we will replicate Study 1 from the original paper.
 
 # Methods
 
 ## Power Analysis
-Using the effect size $f^2 = 0.15$ with $\alpha = 0.05$, we did a post-hoc power analysis on the original sample size of 24 participants. To get 80% power, we need 43 participants in each condition, while 90% requires 55 participants and 95% power requires 70% participants.
+Using the effect size $f^2 = 0.15$ with $\alpha = 0.05$ (original power analysis not reported), we did a post-hoc power analysis on the original sample size of 24 participants. To get 80% power, we need 43 participants in each condition, while 90% requires 55 participants and 95% power requires 70% participants. Our target for replication is the "multiple regression analysis in which we predicted the judgments using DFT, DFT-squared, judgment type (trustworthiness = 1, attractiveness = 0), and their interactions (all predictors centered), F(5, 16) = 285.81, p < .001, R2 = .99".
 
 ## Planned Sample
-The planned sample would be US-based mTurkers, with 45 participants in each condition. We will not be able to replicate the exclusion criteria and restrict the locale to US participants of all genders and all ages. We will collect light demographic information to analyze this difference.
+The planned sample would be US-based mTurkers, with 45 participants in each condition. We will not be able to replicate the exclusion criteria and instead will restrict the locale to US participants of all genders and all ages. We will collect light demographic information to analyze this difference.
 
 ## Materials
 The composite images and questionnaire used in the study is available at https://osf.io/8gwnb/.
@@ -143,7 +143,8 @@ Load the data.
 
 ```{r}
 path <- "~/code/aucProject/data/"
-folder <- "replication-results/"
+#folder <- "replication-results/"
+folder <- "pilot-b-results/"
 files <- dir(paste0(path, folder), pattern = "*.json")
 d.raw <- data.frame()
 d.balance <- data.frame()
@@ -208,7 +209,10 @@ ggplot(d.raw, aes(x=face_dft, y=face_rating, color=factor(workerid))) +
 
 ## Confirmatory analysis
 
-Compute within-subjects means, and errors across participants.
+Our target for replication is "multiple regression analysis in which we predicted the judgments using DFT, DFT-squared, judgment type (trustworthiness = 1, attractiveness = 0), and their interactions (all predictors centered), F(5, 16) = 285.81, p < .001, R2 = .99".
+
+
+First, compute within-subjects means and errors across participants.
 
 ```{r}
 # Within-subjects means
@@ -354,6 +358,11 @@ ggplot(cis, aes(x=factor(face_dft), y=mean_rating, color=exp_type, group=exp_typ
   xlab('DFT %') +
   ylab('Mean Judgment')
 ```
+
+Contrasted against the result from the paper:
+
+![Figure 2 from Sofer et al](figure2.png)
+
 
 ### New dependent variables
 Verify the effects of dependent variables that differ from original study.
